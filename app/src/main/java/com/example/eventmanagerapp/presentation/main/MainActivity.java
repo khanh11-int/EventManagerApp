@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -20,6 +21,7 @@ import com.example.eventmanagerapp.domain.model.Event;
 import com.example.eventmanagerapp.domain.usecase.GetEventsUseCase;
 import com.example.eventmanagerapp.presentation.add.AddEventActivity;
 import com.example.eventmanagerapp.ui.EventCardFactory;
+import com.example.eventmanagerapp.utils.AlarmScheduler;
 import com.example.eventmanagerapp.utils.DateTimeHelper;
 
 import java.util.Calendar;
@@ -43,9 +45,14 @@ public class MainActivity extends AppCompatActivity {
     // Data
     private Calendar selectedDate;
     private Calendar weekStart;
+    private String pendingDateToCreate; // Lưu ngày đang chờ tạo event
 
-    // Use Case
+    // Use Case & Utils
     private GetEventsUseCase getEventsUseCase;
+    private AlarmScheduler alarmScheduler;
+
+    // Request codes
+    private static final int REQUEST_NOTIFICATION_PERMISSION = 1001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +69,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         renderWeek();
+
+        // ✅ Nếu có pending date và đã có quyền → mở AddEventActivity
+        if (pendingDateToCreate != null) {
+            if (alarmScheduler.canScheduleExactAlarms()) {
+                openAddEventActivity(pendingDateToCreate);
+                pendingDateToCreate = null;
+            }
+        }
     }
 
     private void initViews() {
@@ -103,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initData() {
         getEventsUseCase = new GetEventsUseCase(this);
+        alarmScheduler = new AlarmScheduler(this);
 
         selectedDate = Calendar.getInstance();
         weekStart = DateTimeHelper.getWeekStart(selectedDate);
@@ -115,10 +131,10 @@ public class MainActivity extends AppCompatActivity {
         edtDate.setOnClickListener(v -> openDatePicker());
         btnPickDate.setOnClickListener(v -> openDatePicker());
 
+        // ✅ CHECK QUYỀN TRƯỚC KHI MỞ ADD EVENT
         btnAddEvent.setOnClickListener(v -> {
-            Intent intent = new Intent(this, AddEventActivity.class);
-            intent.putExtra("date", DateTimeHelper.formatTagDate(selectedDate));
-            startActivity(intent);
+            String dateTag = DateTimeHelper.formatTagDate(selectedDate);
+            checkPermissionAndOpenAddEvent(dateTag);
         });
     }
 
@@ -159,15 +175,40 @@ public class MainActivity extends AppCompatActivity {
             morningCells[i].setTag(dateTag);
             afternoonCells[i].setTag(dateTag);
 
+            // ✅ CHECK QUYỀN TRƯỚC KHI MỞ ADD EVENT
             final String finalDateTag = dateTag;
-            morningCells[i].setOnClickListener(v -> openAddEvent(finalDateTag));
-            afternoonCells[i].setOnClickListener(v -> openAddEvent(finalDateTag));
+            morningCells[i].setOnClickListener(v -> checkPermissionAndOpenAddEvent(finalDateTag));
+            afternoonCells[i].setOnClickListener(v -> checkPermissionAndOpenAddEvent(finalDateTag));
 
             cursor.add(Calendar.DAY_OF_MONTH, 1);
         }
     }
 
-    private void openAddEvent(String dateTag) {
+    /* ========== CHECK PERMISSION & OPEN ADD EVENT ========== */
+
+    /**
+     * ✅ KIỂM TRA QUYỀN TRƯỚC KHI MỞ ADD EVENT ACTIVITY
+     */
+    private void checkPermissionAndOpenAddEvent(String dateTag) {
+        if (alarmScheduler.canScheduleExactAlarms()) {
+            // ✅ Đã có quyền → Mở ngay
+            openAddEventActivity(dateTag);
+        } else {
+            // ❌ Chưa có quyền → Lưu date và yêu cầu quyền
+            pendingDateToCreate = dateTag;
+            Toast.makeText(
+                    this,
+                    "Vui lòng bật quyền 'Alarms & reminders' để tạo sự kiện",
+                    Toast.LENGTH_LONG
+            ).show();
+            alarmScheduler.openExactAlarmSettings();
+        }
+    }
+
+    /**
+     * Mở AddEventActivity với date đã chọn
+     */
+    private void openAddEventActivity(String dateTag) {
         Intent intent = new Intent(this, AddEventActivity.class);
         intent.putExtra("date", dateTag);
         startActivity(intent);
@@ -209,7 +250,7 @@ public class MainActivity extends AppCompatActivity {
                 ActivityCompat.requestPermissions(
                         this,
                         new String[]{Manifest.permission.POST_NOTIFICATIONS},
-                        1001
+                        REQUEST_NOTIFICATION_PERMISSION
                 );
             }
         }

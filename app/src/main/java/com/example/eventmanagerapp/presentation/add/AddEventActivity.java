@@ -166,15 +166,15 @@ public class AddEventActivity extends AppCompatActivity {
 
     /* ========== SAVE EVENT ========== */
 
+    // AddEventActivity.java - saveEvent() method
     private void saveEvent() {
         String title = edtTitle.getText().toString().trim();
         String note = edtNote.getText().toString().trim();
 
-        // Lấy remind value từ spinner
         int selectedPosition = spinnerRemind.getSelectedItemPosition();
         int remindBefore = remindValues[selectedPosition];
 
-        // Gọi Use Case
+        // Gọi Use Case (không cần lo về quyền nữa vì MainActivity đã check)
         CreateEventUseCase.Result result = createEventUseCase.execute(
                 title, note, selectedDate,
                 startHour, startMinute,
@@ -186,13 +186,8 @@ public class AddEventActivity extends AppCompatActivity {
             Toast.makeText(this, "Đã tạo sự kiện", Toast.LENGTH_SHORT).show();
             finish();
         } else {
-            // Xử lý lỗi
-            if (result.needPermission()) {
-                Toast.makeText(this, result.getErrorMessage(), Toast.LENGTH_LONG).show();
-                alarmScheduler.openExactAlarmSettings();
-            } else {
-                Toast.makeText(this, result.getErrorMessage(), Toast.LENGTH_SHORT).show();
-            }
+            // Chỉ hiển thị lỗi validation
+            Toast.makeText(this, result.getErrorMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 }
