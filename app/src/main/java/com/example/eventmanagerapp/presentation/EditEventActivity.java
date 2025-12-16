@@ -1,4 +1,4 @@
-package com.example.eventmanagerapp.presentation.edit;
+package com.example.eventmanagerapp.presentation;
 
 import android.app.TimePickerDialog;
 import android.os.Bundle;

@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  * Data Access Object - Chỉ lo truy cập database
- * Không có logic nghiệp vụ
+ * ✅ Đã thêm hỗ trợ userId để filter events theo user
  */
 public class EventDao {
 
@@ -20,6 +20,7 @@ public class EventDao {
 
     // Tên cột
     private static final String COL_ID = "id";
+    private static final String COL_USER_ID = "user_id";  // ✅ THÊM
     private static final String COL_TITLE = "title";
     private static final String COL_NOTE = "note";
     private static final String COL_START_TIME = "start_time";
@@ -39,6 +40,7 @@ public class EventDao {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
+        values.put(COL_USER_ID, event.getUserId());  // ✅ THÊM
         values.put(COL_TITLE, event.getTitle());
         values.put(COL_NOTE, event.getNote());
         values.put(COL_START_TIME, event.getStartTime());
@@ -58,6 +60,7 @@ public class EventDao {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
+        values.put(COL_USER_ID, event.getUserId());  // ✅ THÊM
         values.put(COL_TITLE, event.getTitle());
         values.put(COL_NOTE, event.getNote());
         values.put(COL_START_TIME, event.getStartTime());
@@ -116,7 +119,34 @@ public class EventDao {
     }
 
     /**
-     * Lấy tất cả events, sắp xếp theo thời gian bắt đầu
+     * ✅ Lấy tất cả events của 1 user cụ thể, sắp xếp theo thời gian bắt đầu
+     */
+    public List<Event> getAllByUserId(int userId) {
+        List<Event> list = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        Cursor cursor = db.query(
+                TABLE_EVENT,
+                null,
+                COL_USER_ID + "=?",  // ✅ FILTER theo userId
+                new String[]{String.valueOf(userId)},
+                null, null,
+                COL_START_TIME + " ASC"
+        );
+
+        if (cursor.moveToFirst()) {
+            do {
+                list.add(cursorToEvent(cursor));
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+        return list;
+    }
+
+    /**
+     * Lấy tất cả events (không filter) - dùng cho admin hoặc debug
      */
     public List<Event> getAll() {
         List<Event> list = new ArrayList<>();
@@ -140,6 +170,15 @@ public class EventDao {
     }
 
     /**
+     * ✅ Xoá toàn bộ events của 1 user
+     */
+    public void deleteAllByUserId(int userId) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.delete(TABLE_EVENT, COL_USER_ID + "=?", new String[]{String.valueOf(userId)});
+        db.close();
+    }
+
+    /**
      * Xoá toàn bộ events (dùng cho debug/testing)
      */
     public void deleteAll() {
@@ -154,6 +193,7 @@ public class EventDao {
     private Event cursorToEvent(Cursor cursor) {
         Event event = new Event();
         event.setId(cursor.getInt(cursor.getColumnIndexOrThrow(COL_ID)));
+        event.setUserId(cursor.getInt(cursor.getColumnIndexOrThrow(COL_USER_ID)));  // ✅ THÊM
         event.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(COL_TITLE)));
         event.setNote(cursor.getString(cursor.getColumnIndexOrThrow(COL_NOTE)));
         event.setStartTime(cursor.getLong(cursor.getColumnIndexOrThrow(COL_START_TIME)));

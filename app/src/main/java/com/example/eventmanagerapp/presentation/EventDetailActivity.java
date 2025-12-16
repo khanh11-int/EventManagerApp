@@ -1,4 +1,4 @@
-package com.example.eventmanagerapp.presentation.detail;
+package com.example.eventmanagerapp.presentation;
 
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -14,7 +14,6 @@ import com.example.eventmanagerapp.R;
 import com.example.eventmanagerapp.domain.model.Event;
 import com.example.eventmanagerapp.domain.usecase.DeleteEventUseCase;
 import com.example.eventmanagerapp.domain.usecase.GetEventsUseCase;
-import com.example.eventmanagerapp.presentation.edit.EditEventActivity;
 import com.example.eventmanagerapp.utils.DateTimeHelper;
 
 /**

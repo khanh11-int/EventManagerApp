@@ -2,11 +2,12 @@ package com.example.eventmanagerapp.domain.model;
 
 /**
  * Domain Model - Event Entity
- * Chỉ chứa data, không có logic
+ * ✅ Đã thêm userId để phân biệt events của từng user
  */
 public class Event {
 
     private int id;
+    private int userId;         // ✅ THÊM userId
     private String title;
     private String note;
     private long startTime;     // millis
@@ -17,9 +18,10 @@ public class Event {
     public Event() {
     }
 
-    public Event(int id, String title, String note,
+    public Event(int id, int userId, String title, String note,
                  long startTime, long endTime, int remindBefore) {
         this.id = id;
+        this.userId = userId;
         this.title = title;
         this.note = note;
         this.startTime = startTime;
@@ -34,6 +36,14 @@ public class Event {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public String getTitle() {
@@ -78,6 +88,6 @@ public class Event {
 
     @Override
     public String toString() {
-        return "Event{id=" + id + ", title='" + title + "'}";
+        return "Event{id=" + id + ", userId=" + userId + ", title='" + title + "'}";
     }
 }

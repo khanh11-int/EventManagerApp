@@ -1,4 +1,4 @@
-package com.example.eventmanagerapp.presentation.add;
+package com.example.eventmanagerapp.presentation;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;

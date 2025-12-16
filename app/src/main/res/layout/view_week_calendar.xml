@@ -8,14 +8,11 @@
 
     <!-- ================= HEADER ================= -->
     <LinearLayout
-        android:id="@+id/headerRow"
         android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-        <!-- Ô góc: "Buổi" -->
         <TextView
-            android:id="@+id/cellHeaderSession"
             android:layout_width="120dp"
             android:layout_height="80dp"
             android:text="Buổi"
@@ -23,81 +20,22 @@
             android:textStyle="bold"
             android:background="@drawable/bg_grid_cell"/>
 
-        <!-- 7 ô header ngày -->
-        <TextView
-            android:id="@+id/headerDay1"
-            android:layout_width="220dp"
-            android:layout_height="80dp"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:background="@drawable/bg_grid_cell"
-            android:text="Thứ 2&#10;--/--/----"/>
-
-        <TextView
-            android:id="@+id/headerDay2"
-            android:layout_width="220dp"
-            android:layout_height="80dp"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:background="@drawable/bg_grid_cell"
-            android:text="Thứ 3&#10;--/--/----"/>
-
-        <TextView
-            android:id="@+id/headerDay3"
-            android:layout_width="220dp"
-            android:layout_height="80dp"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:background="@drawable/bg_grid_cell"
-            android:text="Thứ 4&#10;--/--/----"/>
-
-        <TextView
-            android:id="@+id/headerDay4"
-            android:layout_width="220dp"
-            android:layout_height="80dp"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:background="@drawable/bg_grid_cell"
-            android:text="Thứ 5&#10;--/--/----"/>
-
-        <TextView
-            android:id="@+id/headerDay5"
-            android:layout_width="220dp"
-            android:layout_height="80dp"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:background="@drawable/bg_grid_cell"
-            android:text="Thứ 6&#10;--/--/----"/>
-
-        <TextView
-            android:id="@+id/headerDay6"
-            android:layout_width="220dp"
-            android:layout_height="80dp"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:background="@drawable/bg_grid_cell"
-            android:text="Thứ 7&#10;--/--/----"/>
-
-        <TextView
-            android:id="@+id/headerDay7"
-            android:layout_width="220dp"
-            android:layout_height="80dp"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:background="@drawable/bg_grid_cell"
-            android:text="Chủ nhật&#10;--/--/----"/>
+        <TextView android:id="@+id/headerDay1" style="@style/HeaderDay" android:text="Thứ 2&#10;--/--/----"/>
+        <TextView android:id="@+id/headerDay2" style="@style/HeaderDay" android:text="Thứ 3&#10;--/--/----"/>
+        <TextView android:id="@+id/headerDay3" style="@style/HeaderDay" android:text="Thứ 4&#10;--/--/----"/>
+        <TextView android:id="@+id/headerDay4" style="@style/HeaderDay" android:text="Thứ 5&#10;--/--/----"/>
+        <TextView android:id="@+id/headerDay5" style="@style/HeaderDay" android:text="Thứ 6&#10;--/--/----"/>
+        <TextView android:id="@+id/headerDay6" style="@style/HeaderDay" android:text="Thứ 7&#10;--/--/----"/>
+        <TextView android:id="@+id/headerDay7" style="@style/HeaderDay" android:text="Chủ nhật&#10;--/--/----"/>
     </LinearLayout>
 
     <!-- ================= ROW: SÁNG ================= -->
     <LinearLayout
-        android:id="@+id/rowMorning"
         android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-        <!-- title Sáng -->
         <TextView
-            android:id="@+id/cellMorningTitle"
             android:layout_width="120dp"
             android:layout_height="220dp"
             android:text="Sáng"
@@ -105,74 +43,23 @@
             android:textStyle="bold"
             android:background="@drawable/bg_grid_cell"/>
 
-        <!-- 7 ô event container (Sáng) -->
-        <LinearLayout
-            android:id="@+id/morningCell1"
-            android:layout_width="220dp"
-            android:layout_height="220dp"
-            android:orientation="vertical"
-            android:padding="8dp"
-            android:background="@drawable/bg_grid_cell"/>
-
-        <LinearLayout
-            android:id="@+id/morningCell2"
-            android:layout_width="220dp"
-            android:layout_height="220dp"
-            android:orientation="vertical"
-            android:padding="8dp"
-            android:background="@drawable/bg_grid_cell"/>
-
-        <LinearLayout
-            android:id="@+id/morningCell3"
-            android:layout_width="220dp"
-            android:layout_height="220dp"
-            android:orientation="vertical"
-            android:padding="8dp"
-            android:background="@drawable/bg_grid_cell"/>
-
-        <LinearLayout
-            android:id="@+id/morningCell4"
-            android:layout_width="220dp"
-            android:layout_height="220dp"
-            android:orientation="vertical"
-            android:padding="8dp"
-            android:background="@drawable/bg_grid_cell"/>
-
-        <LinearLayout
-            android:id="@+id/morningCell5"
-            android:layout_width="220dp"
-            android:layout_height="220dp"
-            android:orientation="vertical"
-            android:padding="8dp"
-            android:background="@drawable/bg_grid_cell"/>
-
-        <LinearLayout
-            android:id="@+id/morningCell6"
-            android:layout_width="220dp"
-            android:layout_height="220dp"
-            android:orientation="vertical"
-            android:padding="8dp"
-            android:background="@drawable/bg_grid_cell"/>
-
-        <LinearLayout
-            android:id="@+id/morningCell7"
-            android:layout_width="220dp"
-            android:layout_height="220dp"
-            android:orientation="vertical"
-            android:padding="8dp"
-            android:background="@drawable/bg_grid_cell"/>
+        <!-- 7 cell sáng -->
+        <include layout="@layout/cell_scroll" android:id="@+id/morningCell1"/>
+        <include layout="@layout/cell_scroll" android:id="@+id/morningCell2"/>
+        <include layout="@layout/cell_scroll" android:id="@+id/morningCell3"/>
+        <include layout="@layout/cell_scroll" android:id="@+id/morningCell4"/>
+        <include layout="@layout/cell_scroll" android:id="@+id/morningCell5"/>
+        <include layout="@layout/cell_scroll" android:id="@+id/morningCell6"/>
+        <include layout="@layout/cell_scroll" android:id="@+id/morningCell7"/>
     </LinearLayout>
 
     <!-- ================= ROW: CHIỀU ================= -->
     <LinearLayout
-        android:id="@+id/rowAfternoon"
         android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-        <!-- title Chiều -->
         <TextView
-            android:id="@+id/cellAfternoonTitle"
             android:layout_width="120dp"
             android:layout_height="220dp"
             android:text="Chiều"
@@ -180,62 +67,14 @@
             android:textStyle="bold"
             android:background="@drawable/bg_grid_cell"/>
 
-        <!-- 7 ô event container (Chiều) -->
-        <LinearLayout
-            android:id="@+id/afternoonCell1"
-            android:layout_width="220dp"
-            android:layout_height="220dp"
-            android:orientation="vertical"
-            android:padding="8dp"
-            android:background="@drawable/bg_grid_cell"/>
-
-        <LinearLayout
-            android:id="@+id/afternoonCell2"
-            android:layout_width="220dp"
-            android:layout_height="220dp"
-            android:orientation="vertical"
-            android:padding="8dp"
-            android:background="@drawable/bg_grid_cell"/>
-
-        <LinearLayout
-            android:id="@+id/afternoonCell3"
-            android:layout_width="220dp"
-            android:layout_height="220dp"
-            android:orientation="vertical"
-            android:padding="8dp"
-            android:background="@drawable/bg_grid_cell"/>
-
-        <LinearLayout
-            android:id="@+id/afternoonCell4"
-            android:layout_width="220dp"
-            android:layout_height="220dp"
-            android:orientation="vertical"
-            android:padding="8dp"
-            android:background="@drawable/bg_grid_cell"/>
-
-        <LinearLayout
-            android:id="@+id/afternoonCell5"
-            android:layout_width="220dp"
-            android:layout_height="220dp"
-            android:orientation="vertical"
-            android:padding="8dp"
-            android:background="@drawable/bg_grid_cell"/>
-
-        <LinearLayout
-            android:id="@+id/afternoonCell6"
-            android:layout_width="220dp"
-            android:layout_height="220dp"
-            android:orientation="vertical"
-            android:padding="8dp"
-            android:background="@drawable/bg_grid_cell"/>
-
-        <LinearLayout
-            android:id="@+id/afternoonCell7"
-            android:layout_width="220dp"
-            android:layout_height="220dp"
-            android:orientation="vertical"
-            android:padding="8dp"
-            android:background="@drawable/bg_grid_cell"/>
+        <!-- 7 cell chiều -->
+        <include layout="@layout/cell_scroll" android:id="@+id/afternoonCell1"/>
+        <include layout="@layout/cell_scroll" android:id="@+id/afternoonCell2"/>
+        <include layout="@layout/cell_scroll" android:id="@+id/afternoonCell3"/>
+        <include layout="@layout/cell_scroll" android:id="@+id/afternoonCell4"/>
+        <include layout="@layout/cell_scroll" android:id="@+id/afternoonCell5"/>
+        <include layout="@layout/cell_scroll" android:id="@+id/afternoonCell6"/>
+        <include layout="@layout/cell_scroll" android:id="@+id/afternoonCell7"/>
     </LinearLayout>
 
 </LinearLayout>

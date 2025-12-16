@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.eventmanagerapp.presentation.detail.EventDetailActivity;
+import com.example.eventmanagerapp.presentation.EventDetailActivity;
 import com.example.eventmanagerapp.R;
 import com.example.eventmanagerapp.domain.model.Event;
 

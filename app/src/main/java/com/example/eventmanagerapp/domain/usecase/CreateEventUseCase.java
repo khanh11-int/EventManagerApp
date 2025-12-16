@@ -6,22 +6,25 @@ import com.example.eventmanagerapp.data.repository.EventRepository;
 import com.example.eventmanagerapp.domain.model.Event;
 import com.example.eventmanagerapp.utils.AlarmScheduler;
 import com.example.eventmanagerapp.utils.DateTimeHelper;
+import com.example.eventmanagerapp.utils.SessionManager;
 import com.example.eventmanagerapp.utils.Validator;
 
 import java.util.Calendar;
 
 /**
  * Use Case - Tạo Event
- * Chứa toàn bộ business logic cho việc tạo event
+ * ✅ Đã thêm userId vào event khi tạo
  */
 public class CreateEventUseCase {
 
     private final EventRepository repository;
     private final AlarmScheduler alarmScheduler;
+    private final SessionManager sessionManager;  // ✅ THÊM
 
     public CreateEventUseCase(Context context) {
         this.repository = EventRepository.getInstance(context);
         this.alarmScheduler = new AlarmScheduler(context);
+        this.sessionManager = new SessionManager(context);  // ✅ THÊM
     }
 
     /**
@@ -33,6 +36,12 @@ public class CreateEventUseCase {
                           int startHour, int startMinute,
                           int endHour, int endMinute,
                           int remindBefore) {
+
+        // 0. ✅ Lấy userId của user hiện tại
+        int userId = sessionManager.getUserId();
+        if (userId == -1) {
+            return Result.error("Vui lòng đăng nhập lại");
+        }
 
         // 1. Validate input
         String error = validateInput(title, dateTag, startHour, startMinute,
@@ -55,17 +64,22 @@ public class CreateEventUseCase {
                 return Result.error(error);
             }
 
-            // 4. ✅ CHECK THỜI GIAN TRƯỚC KHI LƯU DB
+            // 4. CHECK THỜI GIAN TRƯỚC KHI LƯU DB
             error = Validator.validateFutureTime(startMillis);
             if (error != null) {
-                // ❌ KHÔNG LƯU DB nếu thời gian đã qua
                 return Result.error(error);
             }
 
-            // 5. Tạo Event object
-            Event event = new Event(0, title, note, startMillis, endMillis, remindBefore);
+            // 5. ✅ Tạo Event object với userId
+            Event event = new Event();
+            event.setUserId(userId);  // ✅ SET userId
+            event.setTitle(title);
+            event.setNote(note);
+            event.setStartTime(startMillis);
+            event.setEndTime(endMillis);
+            event.setRemindBefore(remindBefore);
 
-            // 6. Lưu vào DB (chỉ khi validation pass hết)
+            // 6. Lưu vào DB
             long eventId = repository.createEvent(event);
             if (eventId <= 0) {
                 return Result.error("Không thể lưu sự kiện");
@@ -82,8 +96,6 @@ public class CreateEventUseCase {
             );
 
             if (!alarmSet) {
-                // ⚠️ Đã lưu DB nhưng không schedule được alarm
-                // Có thể xử lý: xóa event hoặc để user biết
                 return Result.errorNeedPermission("Cần quyền 'Báo chính xác' để đặt nhắc nhở");
             }
 
@@ -120,7 +132,7 @@ public class CreateEventUseCase {
     }
 
     /**
-     * Result class - Kết quả của use case
+     * Result class
      */
     public static class Result {
         private final boolean success;

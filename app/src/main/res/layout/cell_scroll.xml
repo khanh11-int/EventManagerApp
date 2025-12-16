@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.recyclerview.widget.RecyclerView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/cellRecycler"
+    android:layout_width="220dp"
+    android:layout_height="220dp"
+    android:background="@drawable/bg_grid_cell"
+    android:padding="8dp"
+    android:clipToPadding="false"
+    android:nestedScrollingEnabled="true"
+    android:overScrollMode="never"/>

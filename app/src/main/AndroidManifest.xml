@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
     <!-- Permissions -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
@@ -15,36 +14,33 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.EventManagerApp">
-
-        <!-- MainActivity - Launcher -->
         <activity
-            android:name=".presentation.main.MainActivity"
+            android:name=".presentation.auth.RegisterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".presentation.MainActivity"
+            android:exported="false"/> <!-- MainActivity - Launcher -->
+        <activity
+            android:name=".presentation.auth.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- AddEventActivity -->
+        </activity> <!-- AddEventActivity -->
         <activity
-            android:name=".presentation.add.AddEventActivity"
+            android:name=".presentation.AddEventActivity"
             android:exported="false"
-            android:parentActivityName=".presentation.main.MainActivity" />
-
-        <!-- EditEventActivity -->
+            android:parentActivityName=".presentation.MainActivity" /> <!-- EditEventActivity -->
         <activity
-            android:name=".presentation.edit.EditEventActivity"
+            android:name=".presentation.EditEventActivity"
             android:exported="false"
-            android:parentActivityName=".presentation.detail.EventDetailActivity" />
-
-        <!-- EventDetailActivity -->
+            android:parentActivityName=".presentation.EventDetailActivity" /> <!-- EventDetailActivity -->
         <activity
-            android:name=".presentation.detail.EventDetailActivity"
+            android:name=".presentation.EventDetailActivity"
             android:exported="false"
-            android:parentActivityName=".presentation.main.MainActivity" />
-
-        <!-- AlarmReceiver - Broadcast Receiver -->
+            android:parentActivityName=".presentation.MainActivity" /> <!-- AlarmReceiver - Broadcast Receiver -->
         <receiver
             android:name=".utils.AlarmReceiver"
             android:exported="false">
@@ -52,7 +48,6 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-
     </application>
 
 </manifest>

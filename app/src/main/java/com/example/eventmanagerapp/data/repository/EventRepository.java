@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  * Repository Pattern - Trung gian giữa Data Layer và Domain Layer
- * Có thể mở rộng: lấy data từ API, cache, ...
+ * ✅ Đã thêm hỗ trợ filter events theo userId
  */
 public class EventRepository {
 
@@ -61,10 +61,24 @@ public class EventRepository {
     }
 
     /**
-     * Lấy tất cả events
+     * ✅ Lấy tất cả events của 1 user
+     */
+    public List<Event> getEventsByUserId(int userId) {
+        return eventDao.getAllByUserId(userId);
+    }
+
+    /**
+     * Lấy tất cả events (không filter)
      */
     public List<Event> getAllEvents() {
         return eventDao.getAll();
+    }
+
+    /**
+     * ✅ Xoá tất cả events của 1 user
+     */
+    public void clearAllByUserId(int userId) {
+        eventDao.deleteAllByUserId(userId);
     }
 
     /**

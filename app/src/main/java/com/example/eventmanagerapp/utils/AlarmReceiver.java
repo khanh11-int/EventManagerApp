@@ -10,7 +10,7 @@ import android.os.Build;
 
 import androidx.core.app.NotificationCompat;
 
-import com.example.eventmanagerapp.presentation.detail.EventDetailActivity;
+import com.example.eventmanagerapp.presentation.EventDetailActivity;
 
 public class AlarmReceiver extends BroadcastReceiver {
 

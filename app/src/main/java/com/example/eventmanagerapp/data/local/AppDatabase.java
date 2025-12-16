@@ -6,14 +6,15 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 /**
  * Database Helper - Singleton pattern
- * Chỉ lo quản lý database (tạo, upgrade)
+ * Quản lý database (tạo, upgrade)
  */
 public class AppDatabase extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "event_manager.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3; // ✅ Tăng version lên 3
 
     private static final String TABLE_EVENT = "events";
+    private static final String TABLE_USER = "users"; // ✅ Thêm bảng user
 
     // Singleton instance
     private static AppDatabase instance;
@@ -22,9 +23,6 @@ public class AppDatabase extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
-    /**
-     * Singleton pattern - chỉ có 1 instance duy nhất
-     */
     public static synchronized AppDatabase getInstance(Context context) {
         if (instance == null) {
             instance = new AppDatabase(context.getApplicationContext());
@@ -34,22 +32,50 @@ public class AppDatabase extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String createTable = "CREATE TABLE " + TABLE_EVENT + " (" +
+        // ===== TẠO BẢNG USERS =====
+        String createUserTable = "CREATE TABLE " + TABLE_USER + " (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "username TEXT UNIQUE NOT NULL, " +
+                "password TEXT NOT NULL, " +
+                "full_name TEXT, " +
+                "created_at INTEGER NOT NULL" +
+                ")";
+        db.execSQL(createUserTable);
+
+        // ===== TẠO BẢNG EVENTS (có thêm user_id) =====
+        String createEventTable = "CREATE TABLE " + TABLE_EVENT + " (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "user_id INTEGER NOT NULL, " + // ✅ Thêm user_id
                 "title TEXT NOT NULL, " +
                 "note TEXT, " +
                 "start_time INTEGER NOT NULL, " +
                 "end_time INTEGER NOT NULL, " +
-                "remind_before INTEGER DEFAULT 0" +
+                "remind_before INTEGER DEFAULT 0, " +
+                "FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE" +
                 ")";
-        db.execSQL(createTable);
+        db.execSQL(createEventTable);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Trong production, nên migration thay vì drop table
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENT);
-        onCreate(db);
+        if (oldVersion < 3) {
+            // Tạo bảng users
+            String createUserTable = "CREATE TABLE IF NOT EXISTS " + TABLE_USER + " (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "username TEXT UNIQUE NOT NULL, " +
+                    "password TEXT NOT NULL, " +
+                    "full_name TEXT, " +
+                    "created_at INTEGER NOT NULL" +
+                    ")";
+            db.execSQL(createUserTable);
+
+            // Thêm cột user_id vào bảng events (nếu chưa có)
+            try {
+                db.execSQL("ALTER TABLE " + TABLE_EVENT + " ADD COLUMN user_id INTEGER DEFAULT 1");
+            } catch (Exception e) {
+                // Cột đã tồn tại
+            }
+        }
     }
 
     @Override

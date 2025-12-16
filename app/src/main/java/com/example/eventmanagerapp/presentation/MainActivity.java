@@ -1,4 +1,4 @@
-package com.example.eventmanagerapp.presentation.main;
+package com.example.eventmanagerapp.presentation;
 
 import android.Manifest;
 import android.app.DatePickerDialog;
@@ -8,29 +8,27 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.eventmanagerapp.R;
 import com.example.eventmanagerapp.domain.model.Event;
 import com.example.eventmanagerapp.domain.usecase.GetEventsUseCase;
-import com.example.eventmanagerapp.presentation.add.AddEventActivity;
-import com.example.eventmanagerapp.ui.EventCardFactory;
+import com.example.eventmanagerapp.presentation.auth.LoginActivity;
+import com.example.eventmanagerapp.ui.EventAdapter;
 import com.example.eventmanagerapp.utils.AlarmScheduler;
 import com.example.eventmanagerapp.utils.DateTimeHelper;
+import com.example.eventmanagerapp.utils.SessionManager;
 
 import java.util.Calendar;
 import java.util.List;
 
-/**
- * MainActivity - Chỉ lo UI và tương tác user
- * Logic đã tách ra Helper và UseCase
- */
 public class MainActivity extends AppCompatActivity {
 
     // Views
@@ -39,24 +37,39 @@ public class MainActivity extends AppCompatActivity {
     private Button btnAddEvent;
 
     private TextView[] headerDays = new TextView[7];
-    private LinearLayout[] morningCells = new LinearLayout[7];
-    private LinearLayout[] afternoonCells = new LinearLayout[7];
+
+    // ✅ đổi sang RecyclerView cho từng ô (để scroll trong ô)
+    private RecyclerView[] morningCells = new RecyclerView[7];
+    private RecyclerView[] afternoonCells = new RecyclerView[7];
+
+    // ✅ adapter cho từng ô
+    private EventAdapter[] morningAdapters = new EventAdapter[7];
+    private EventAdapter[] afternoonAdapters = new EventAdapter[7];
 
     // Data
     private Calendar selectedDate;
     private Calendar weekStart;
-    private String pendingDateToCreate; // Lưu ngày đang chờ tạo event
+    private String pendingDateToCreate;
 
     // Use Case & Utils
     private GetEventsUseCase getEventsUseCase;
     private AlarmScheduler alarmScheduler;
 
-    // Request codes
     private static final int REQUEST_NOTIFICATION_PERMISSION = 1001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        SessionManager sessionManager = new SessionManager(this);
+        if (!sessionManager.isLoggedIn()) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+            return;
+        }
+
         setContentView(R.layout.activity_main);
 
         initViews();
@@ -70,7 +83,6 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         renderWeek();
 
-        // ✅ Nếu có pending date và đã có quyền → mở AddEventActivity
         if (pendingDateToCreate != null) {
             if (alarmScheduler.canScheduleExactAlarms()) {
                 openAddEventActivity(pendingDateToCreate);
@@ -97,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
         headerDays[5] = findViewById(R.id.headerDay6);
         headerDays[6] = findViewById(R.id.headerDay7);
 
-        // Morning cells
+        // Morning cells (RecyclerView)
         morningCells[0] = findViewById(R.id.morningCell1);
         morningCells[1] = findViewById(R.id.morningCell2);
         morningCells[2] = findViewById(R.id.morningCell3);
@@ -106,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
         morningCells[5] = findViewById(R.id.morningCell6);
         morningCells[6] = findViewById(R.id.morningCell7);
 
-        // Afternoon cells
+        // Afternoon cells (RecyclerView)
         afternoonCells[0] = findViewById(R.id.afternoonCell1);
         afternoonCells[1] = findViewById(R.id.afternoonCell2);
         afternoonCells[2] = findViewById(R.id.afternoonCell3);
@@ -114,6 +126,18 @@ public class MainActivity extends AppCompatActivity {
         afternoonCells[4] = findViewById(R.id.afternoonCell5);
         afternoonCells[5] = findViewById(R.id.afternoonCell6);
         afternoonCells[6] = findViewById(R.id.afternoonCell7);
+
+        // Init adapter + layout manager cho từng ô
+        for (int i = 0; i < 7; i++) {
+            morningAdapters[i] = new EventAdapter();
+            afternoonAdapters[i] = new EventAdapter();
+
+            morningCells[i].setLayoutManager(new LinearLayoutManager(this));
+            afternoonCells[i].setLayoutManager(new LinearLayoutManager(this));
+
+            morningCells[i].setAdapter(morningAdapters[i]);
+            afternoonCells[i].setAdapter(afternoonAdapters[i]);
+        }
     }
 
     private void initData() {
@@ -131,14 +155,11 @@ public class MainActivity extends AppCompatActivity {
         edtDate.setOnClickListener(v -> openDatePicker());
         btnPickDate.setOnClickListener(v -> openDatePicker());
 
-        // ✅ CHECK QUYỀN TRƯỚC KHI MỞ ADD EVENT
         btnAddEvent.setOnClickListener(v -> {
             String dateTag = DateTimeHelper.formatTagDate(selectedDate);
             checkPermissionAndOpenAddEvent(dateTag);
         });
     }
-
-    /* ========== DATE PICKER ========== */
 
     private void openDatePicker() {
         new DatePickerDialog(
@@ -172,10 +193,10 @@ public class MainActivity extends AppCompatActivity {
 
             headerDays[i].setText(headerText);
 
+            // ✅ giữ y như cấu trúc cũ: setTag để so eventDate
             morningCells[i].setTag(dateTag);
             afternoonCells[i].setTag(dateTag);
 
-            // ✅ CHECK QUYỀN TRƯỚC KHI MỞ ADD EVENT
             final String finalDateTag = dateTag;
             morningCells[i].setOnClickListener(v -> checkPermissionAndOpenAddEvent(finalDateTag));
             afternoonCells[i].setOnClickListener(v -> checkPermissionAndOpenAddEvent(finalDateTag));
@@ -184,40 +205,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /* ========== CHECK PERMISSION & OPEN ADD EVENT ========== */
-
-    /**
-     * ✅ KIỂM TRA QUYỀN TRƯỚC KHI MỞ ADD EVENT ACTIVITY
-     */
-    private void checkPermissionAndOpenAddEvent(String dateTag) {
-        if (alarmScheduler.canScheduleExactAlarms()) {
-            // ✅ Đã có quyền → Mở ngay
-            openAddEventActivity(dateTag);
-        } else {
-            // ❌ Chưa có quyền → Lưu date và yêu cầu quyền
-            pendingDateToCreate = dateTag;
-            Toast.makeText(
-                    this,
-                    "Vui lòng bật quyền 'Alarms & reminders' để tạo sự kiện",
-                    Toast.LENGTH_LONG
-            ).show();
-            alarmScheduler.openExactAlarmSettings();
-        }
-    }
-
-    /**
-     * Mở AddEventActivity với date đã chọn
-     */
-    private void openAddEventActivity(String dateTag) {
-        Intent intent = new Intent(this, AddEventActivity.class);
-        intent.putExtra("date", dateTag);
-        startActivity(intent);
-    }
-
     private void clearAllCells() {
         for (int i = 0; i < 7; i++) {
-            morningCells[i].removeAllViews();
-            afternoonCells[i].removeAllViews();
+            morningAdapters[i].clear();
+            afternoonAdapters[i].clear();
         }
     }
 
@@ -228,15 +219,39 @@ public class MainActivity extends AppCompatActivity {
             String eventDate = DateTimeHelper.formatTagDate(event.getStartTime());
             boolean isMorning = DateTimeHelper.isMorning(event.getStartTime());
 
-            LinearLayout[] targetRow = isMorning ? morningCells : afternoonCells;
+            RecyclerView[] targetRow = isMorning ? morningCells : afternoonCells;
+            EventAdapter[] targetAdapters = isMorning ? morningAdapters : afternoonAdapters;
 
+            // ✅ giữ đúng cấu trúc cũ: loop 7 ô và so tag
             for (int i = 0; i < 7; i++) {
                 String cellTag = (String) targetRow[i].getTag();
                 if (eventDate.equals(cellTag)) {
-                    targetRow[i].addView(EventCardFactory.create(this, event));
+                    targetAdapters[i].addEvent(event);
                 }
             }
         }
+    }
+
+    /* ========== CHECK PERMISSION & OPEN ADD EVENT ========== */
+
+    private void checkPermissionAndOpenAddEvent(String dateTag) {
+        if (alarmScheduler.canScheduleExactAlarms()) {
+            openAddEventActivity(dateTag);
+        } else {
+            pendingDateToCreate = dateTag;
+            Toast.makeText(
+                    this,
+                    "Vui lòng bật quyền 'Alarms & reminders' để tạo sự kiện",
+                    Toast.LENGTH_LONG
+            ).show();
+            alarmScheduler.openExactAlarmSettings();
+        }
+    }
+
+    private void openAddEventActivity(String dateTag) {
+        Intent intent = new Intent(this, AddEventActivity.class);
+        intent.putExtra("date", dateTag);
+        startActivity(intent);
     }
 
     /* ========== PERMISSION ========== */
