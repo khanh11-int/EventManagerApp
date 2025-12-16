@@ -6,9 +6,6 @@ import com.example.eventmanagerapp.data.local.UserDao;
 import com.example.eventmanagerapp.domain.model.User;
 import com.example.eventmanagerapp.utils.SessionManager;
 
-/**
- * Use Case - Đăng ký
- */
 public class RegisterUseCase {
 
     private final UserDao userDao;
@@ -19,29 +16,22 @@ public class RegisterUseCase {
         this.sessionManager = new SessionManager(context);
     }
 
-    /**
-     * Thực hiện đăng ký
-     */
     public Result execute(String username, String password, String confirmPassword, String fullName) {
-        // 1. Validate input
         String error = validateInput(username, password, confirmPassword);
         if (error != null) {
             return Result.error(error);
         }
 
-        // 2. Check username đã tồn tại chưa
         if (userDao.isUsernameExists(username.trim())) {
             return Result.error("Tên đăng nhập đã được sử dụng");
         }
 
-        // 3. Tạo user mới
         User user = new User();
         user.setUsername(username.trim());
         user.setPassword(password);
         user.setFullName(fullName != null ? fullName.trim() : "");
         user.setCreatedAt(System.currentTimeMillis());
 
-        // 4. Lưu vào database
         long userId = userDao.insert(user);
 
         if (userId <= 0) {
@@ -50,15 +40,11 @@ public class RegisterUseCase {
 
         user.setId((int) userId);
 
-        // 5. Tự động đăng nhập sau khi đăng ký
         sessionManager.createLoginSession(user.getId(), user.getUsername());
 
         return Result.success(user);
     }
 
-    /**
-     * Validate input
-     */
     private String validateInput(String username, String password, String confirmPassword) {
         if (username == null || username.trim().isEmpty()) {
             return "Vui lòng nhập tên đăng nhập";
@@ -83,9 +69,6 @@ public class RegisterUseCase {
         return null;
     }
 
-    /**
-     * Result class
-     */
     public static class Result {
         private final boolean success;
         private final String errorMessage;

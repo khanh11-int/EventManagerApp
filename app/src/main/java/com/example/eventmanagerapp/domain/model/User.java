@@ -1,8 +1,5 @@
 package com.example.eventmanagerapp.domain.model;
 
-/**
- * Domain Model - User Entity
- */
 public class User {
 
     private int id;
@@ -22,7 +19,6 @@ public class User {
         this.createdAt = createdAt;
     }
 
-    // Getters & Setters
     public int getId() {
         return id;
     }

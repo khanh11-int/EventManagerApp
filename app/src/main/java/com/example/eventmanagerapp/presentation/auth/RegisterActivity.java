@@ -13,9 +13,6 @@ import com.example.eventmanagerapp.R;
 import com.example.eventmanagerapp.domain.usecase.RegisterUseCase;
 import com.example.eventmanagerapp.presentation.MainActivity;
 
-/**
- * RegisterActivity - Màn hình đăng ký
- */
 public class RegisterActivity extends AppCompatActivity {
 
     private EditText edtFullName, edtUsername, edtPassword, edtConfirmPassword;
@@ -53,16 +50,12 @@ public class RegisterActivity extends AppCompatActivity {
         tvLogin.setOnClickListener(v -> finish());
     }
 
-    /**
-     * Xử lý đăng ký
-     */
     private void handleRegister() {
         String fullName = edtFullName.getText().toString().trim();
         String username = edtUsername.getText().toString().trim();
         String password = edtPassword.getText().toString();
         String confirmPassword = edtConfirmPassword.getText().toString();
 
-        // Gọi Use Case
         RegisterUseCase.Result result = registerUseCase.execute(
                 username, password, confirmPassword, fullName
         );
@@ -75,9 +68,6 @@ public class RegisterActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Chuyển sang MainActivity
-     */
     private void navigateToMain() {
         Intent intent = new Intent(this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

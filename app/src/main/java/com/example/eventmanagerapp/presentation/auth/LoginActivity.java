@@ -14,9 +14,6 @@ import com.example.eventmanagerapp.domain.usecase.LoginUseCase;
 import com.example.eventmanagerapp.presentation.MainActivity;
 import com.example.eventmanagerapp.utils.SessionManager;
 
-/**
- * LoginActivity - Màn hình đăng nhập
- */
 public class LoginActivity extends AppCompatActivity {
 
     private EditText edtUsername, edtPassword;
@@ -30,7 +27,6 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // ✅ Check nếu đã đăng nhập → chuyển thẳng vào MainActivity
         sessionManager = new SessionManager(this);
         if (sessionManager.isLoggedIn()) {
             navigateToMain();
@@ -64,14 +60,10 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Xử lý đăng nhập
-     */
     private void handleLogin() {
         String username = edtUsername.getText().toString().trim();
         String password = edtPassword.getText().toString();
 
-        // Gọi Use Case
         LoginUseCase.Result result = loginUseCase.execute(username, password);
 
         if (result.isSuccess()) {
@@ -82,9 +74,6 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Chuyển sang MainActivity
-     */
     private void navigateToMain() {
         Intent intent = new Intent(this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

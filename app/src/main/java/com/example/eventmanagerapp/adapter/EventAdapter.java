@@ -18,10 +18,6 @@ import com.example.eventmanagerapp.utils.DateTimeHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Adapter cho 1 cell (Sáng/Chiều).
- * ✅ Refactored để sử dụng XML layout thay vì EventCardFactory
- */
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
 
     private final List<Event> data = new ArrayList<>();
@@ -61,9 +57,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         return data.size();
     }
 
-    /**
-     * ViewHolder chuẩn cho Event
-     */
     static class EventViewHolder extends RecyclerView.ViewHolder {
 
         private final TextView tvTitle;
@@ -78,17 +71,14 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         }
 
         void bind(Event event) {
-            // Set title
             tvTitle.setText(event.getTitle());
 
-            // Set time range
             String timeText = DateTimeHelper.formatTimeRange(
                     event.getStartTime(),
                     event.getEndTime()
             );
             tvTime.setText(timeText);
 
-            // Set click listener để mở detail
             itemView.setOnClickListener(v -> {
                 Intent intent = new Intent(context, EventDetailActivity.class);
                 intent.putExtra("event_id", event.getId());

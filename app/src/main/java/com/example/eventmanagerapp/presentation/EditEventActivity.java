@@ -19,23 +19,17 @@ import com.example.eventmanagerapp.utils.DateTimeHelper;
 
 import java.util.Calendar;
 
-/**
- * EditEventActivity - Chỉ lo UI
- */
 public class EditEventActivity extends AppCompatActivity {
 
-    // Views
     private TextView tvDate;
     private EditText edtTitle, edtNote;
     private Button btnPickStart, btnPickEnd, btnSave;
     private Spinner spinnerRemind;
 
-    // Data
     private Event event;
     private Calendar startCal, endCal;
     private int[] remindValues;
 
-    // Use Cases
     private GetEventsUseCase getEventsUseCase;
     private UpdateEventUseCase updateEventUseCase;
 
@@ -58,7 +52,6 @@ public class EditEventActivity extends AppCompatActivity {
         edtNote = findViewById(R.id.edtNote);
         spinnerRemind = findViewById(R.id.spinnerRemind);
 
-        // Setup Spinner
         setupRemindSpinner();
     }
 
@@ -107,15 +100,11 @@ public class EditEventActivity extends AppCompatActivity {
 
         updateTimeButtons();
 
-        // Set spinner position dựa vào remindBefore
         int remindBefore = event.getRemindBefore();
         int position = findRemindPosition(remindBefore);
         spinnerRemind.setSelection(position);
     }
 
-    /**
-     * Tìm vị trí trong spinner tương ứng với remindBefore
-     */
     private int findRemindPosition(int remindBefore) {
         for (int i = 0; i < remindValues.length; i++) {
             if (remindValues[i] == remindBefore) {
@@ -135,8 +124,6 @@ public class EditEventActivity extends AppCompatActivity {
         btnPickEnd.setOnClickListener(v -> openEndTimePicker());
         btnSave.setOnClickListener(v -> saveEdit());
     }
-
-    /* ========== TIME PICKER ========== */
 
     private void openStartTimePicker() {
         new TimePickerDialog(
@@ -168,17 +155,13 @@ public class EditEventActivity extends AppCompatActivity {
         ).show();
     }
 
-    /* ========== SAVE ========== */
-
     private void saveEdit() {
         String title = edtTitle.getText().toString().trim();
         String note = edtNote.getText().toString().trim();
 
-        // Lấy remind value
         int selectedPosition = spinnerRemind.getSelectedItemPosition();
         int remindBefore = remindValues[selectedPosition];
 
-        // Gọi Use Case
         UpdateEventUseCase.Result result = updateEventUseCase.execute(
                 event.getId(),
                 title,

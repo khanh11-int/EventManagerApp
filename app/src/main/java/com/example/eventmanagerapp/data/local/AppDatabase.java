@@ -4,19 +4,14 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-/**
- * Database Helper - Singleton pattern
- * Quản lý database (tạo, upgrade)
- */
 public class AppDatabase extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "event_manager.db";
-    private static final int DATABASE_VERSION = 3; // ✅ Tăng version lên 3
+    private static final int DATABASE_VERSION = 3;
 
     private static final String TABLE_EVENT = "events";
-    private static final String TABLE_USER = "users"; // ✅ Thêm bảng user
+    private static final String TABLE_USER = "users";
 
-    // Singleton instance
     private static AppDatabase instance;
 
     private AppDatabase(Context context) {
@@ -32,7 +27,6 @@ public class AppDatabase extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        // ===== TẠO BẢNG USERS =====
         String createUserTable = "CREATE TABLE " + TABLE_USER + " (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "username TEXT UNIQUE NOT NULL, " +
@@ -42,10 +36,9 @@ public class AppDatabase extends SQLiteOpenHelper {
                 ")";
         db.execSQL(createUserTable);
 
-        // ===== TẠO BẢNG EVENTS (có thêm user_id) =====
         String createEventTable = "CREATE TABLE " + TABLE_EVENT + " (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "user_id INTEGER NOT NULL, " + // ✅ Thêm user_id
+                "user_id INTEGER NOT NULL, " +
                 "title TEXT NOT NULL, " +
                 "note TEXT, " +
                 "start_time INTEGER NOT NULL, " +
@@ -69,7 +62,6 @@ public class AppDatabase extends SQLiteOpenHelper {
                     ")";
             db.execSQL(createUserTable);
 
-            // Thêm cột user_id vào bảng events (nếu chưa có)
             try {
                 db.execSQL("ALTER TABLE " + TABLE_EVENT + " ADD COLUMN user_id INTEGER DEFAULT 1");
             } catch (Exception e) {
