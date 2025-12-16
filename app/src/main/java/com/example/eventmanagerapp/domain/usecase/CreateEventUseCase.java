@@ -11,39 +11,28 @@ import com.example.eventmanagerapp.utils.Validator;
 
 import java.util.Calendar;
 
-/**
- * Use Case - Tạo Event
- * ✅ Đã thêm userId vào event khi tạo
- */
 public class CreateEventUseCase {
 
     private final EventRepository repository;
     private final AlarmScheduler alarmScheduler;
-    private final SessionManager sessionManager;  // ✅ THÊM
+    private final SessionManager sessionManager;
 
     public CreateEventUseCase(Context context) {
         this.repository = EventRepository.getInstance(context);
         this.alarmScheduler = new AlarmScheduler(context);
-        this.sessionManager = new SessionManager(context);  // ✅ THÊM
+        this.sessionManager = new SessionManager(context);
     }
 
-    /**
-     * Tạo event mới
-     * @param remindBefore Nhắc trước bao nhiêu phút (0 = đúng giờ)
-     * @return Result object chứa thông tin kết quả
-     */
     public Result execute(String title, String note, String dateTag,
                           int startHour, int startMinute,
                           int endHour, int endMinute,
                           int remindBefore) {
 
-        // 0. ✅ Lấy userId của user hiện tại
         int userId = sessionManager.getUserId();
         if (userId == -1) {
             return Result.error("Vui lòng đăng nhập lại");
         }
 
-        // 1. Validate input
         String error = validateInput(title, dateTag, startHour, startMinute,
                 endHour, endMinute);
         if (error != null) {
@@ -51,44 +40,37 @@ public class CreateEventUseCase {
         }
 
         try {
-            // 2. Tạo Calendar objects
             Calendar startCal = DateTimeHelper.createDateTime(dateTag, startHour, startMinute);
             Calendar endCal = DateTimeHelper.createDateTime(dateTag, endHour, endMinute);
 
             long startMillis = startCal.getTimeInMillis();
             long endMillis = endCal.getTimeInMillis();
 
-            // 3. Validate time range
             error = Validator.validateTimeRange(startMillis, endMillis);
             if (error != null) {
                 return Result.error(error);
             }
 
-            // 4. CHECK THỜI GIAN TRƯỚC KHI LƯU DB
             error = Validator.validateFutureTime(startMillis);
             if (error != null) {
                 return Result.error(error);
             }
 
-            // 5. ✅ Tạo Event object với userId
             Event event = new Event();
-            event.setUserId(userId);  // ✅ SET userId
+            event.setUserId(userId);
             event.setTitle(title);
             event.setNote(note);
             event.setStartTime(startMillis);
             event.setEndTime(endMillis);
             event.setRemindBefore(remindBefore);
 
-            // 6. Lưu vào DB
             long eventId = repository.createEvent(event);
             if (eventId <= 0) {
                 return Result.error("Không thể lưu sự kiện");
             }
 
-            // 7. Tính thời điểm nhắc nhở
             long alarmTime = startMillis - (remindBefore * 60 * 1000L);
 
-            // 8. Schedule alarm
             boolean alarmSet = alarmScheduler.scheduleAlarm(
                     (int) eventId,
                     title,
@@ -106,9 +88,6 @@ public class CreateEventUseCase {
         }
     }
 
-    /**
-     * Validate input
-     */
     private String validateInput(String title, String dateTag,
                                  int startHour, int startMinute,
                                  int endHour, int endMinute) {
@@ -131,9 +110,6 @@ public class CreateEventUseCase {
         return null;
     }
 
-    /**
-     * Result class
-     */
     public static class Result {
         private final boolean success;
         private final String errorMessage;

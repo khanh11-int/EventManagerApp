@@ -22,7 +22,6 @@ public class AlarmReceiver extends BroadcastReceiver {
         String title = intent.getStringExtra("title");
         if (title == null || title.trim().isEmpty()) title = "Nhắc nhở sự kiện";
 
-        // Bấm notification -> mở trang chi tiết
         Intent open = new Intent(context, EventDetailActivity.class);
         open.putExtra("event_id", eventId);
         open.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -37,7 +36,6 @@ public class AlarmReceiver extends BroadcastReceiver {
         NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         if (nm == null) return;
 
-        // Android 8+ cần channel
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
                     CHANNEL_ID,

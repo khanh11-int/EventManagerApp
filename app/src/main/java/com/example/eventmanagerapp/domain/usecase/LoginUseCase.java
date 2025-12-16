@@ -6,9 +6,6 @@ import com.example.eventmanagerapp.data.local.UserDao;
 import com.example.eventmanagerapp.domain.model.User;
 import com.example.eventmanagerapp.utils.SessionManager;
 
-/**
- * Use Case - Đăng nhập
- */
 public class LoginUseCase {
 
     private final UserDao userDao;
@@ -19,11 +16,7 @@ public class LoginUseCase {
         this.sessionManager = new SessionManager(context);
     }
 
-    /**
-     * Thực hiện đăng nhập
-     */
     public Result execute(String username, String password) {
-        // 1. Validate input
         if (username == null || username.trim().isEmpty()) {
             return Result.error("Vui lòng nhập tên đăng nhập");
         }
@@ -32,27 +25,21 @@ public class LoginUseCase {
             return Result.error("Vui lòng nhập mật khẩu");
         }
 
-        // 2. Tìm user trong database
         User user = userDao.findByUsername(username.trim());
 
         if (user == null) {
             return Result.error("Tên đăng nhập không tồn tại");
         }
 
-        // 3. Check password
         if (!user.getPassword().equals(password)) {
             return Result.error("Mật khẩu không đúng");
         }
 
-        // 4. Lưu session
         sessionManager.createLoginSession(user.getId(), user.getUsername());
 
         return Result.success(user);
     }
 
-    /**
-     * Result class
-     */
     public static class Result {
         private final boolean success;
         private final String errorMessage;

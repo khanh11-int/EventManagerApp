@@ -1,20 +1,15 @@
 package com.example.eventmanagerapp.domain.model;
 
-/**
- * Domain Model - Event Entity
- * ✅ Đã thêm userId để phân biệt events của từng user
- */
 public class Event {
 
     private int id;
-    private int userId;         // ✅ THÊM userId
+    private int userId;
     private String title;
     private String note;
-    private long startTime;     // millis
-    private long endTime;       // millis
-    private int remindBefore;   // phút nhắc trước (0 = đúng giờ)
+    private long startTime;
+    private long endTime;
+    private int remindBefore;
 
-    // Constructor
     public Event() {
     }
 
@@ -29,7 +24,6 @@ public class Event {
         this.remindBefore = remindBefore;
     }
 
-    // Getters & Setters
     public int getId() {
         return id;
     }

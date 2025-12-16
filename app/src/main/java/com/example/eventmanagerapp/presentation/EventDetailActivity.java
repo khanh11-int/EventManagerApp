@@ -16,21 +16,15 @@ import com.example.eventmanagerapp.domain.usecase.DeleteEventUseCase;
 import com.example.eventmanagerapp.domain.usecase.GetEventsUseCase;
 import com.example.eventmanagerapp.utils.DateTimeHelper;
 
-/**
- * EventDetailActivity - Chỉ lo UI
- */
 public class EventDetailActivity extends AppCompatActivity {
 
-    // Views
     private TextView tvTitle, tvDateTime, tvNote, tvRemind;
     private ImageButton btnClose;
     private Button btnEdit, btnDelete;
 
-    // Data
     private Event event;
     private int eventId;
 
-    // Use Cases
     private GetEventsUseCase getEventsUseCase;
     private DeleteEventUseCase deleteEventUseCase;
 
@@ -89,7 +83,6 @@ public class EventDetailActivity extends AppCompatActivity {
     private void showEventDetail() {
         tvTitle.setText(event.getTitle());
 
-        // Note
         String note = event.getNote();
         if (note == null || note.trim().isEmpty()) {
             tvNote.setText("(Không có ghi chú)");
@@ -97,7 +90,6 @@ public class EventDetailActivity extends AppCompatActivity {
             tvNote.setText(note);
         }
 
-        // Date & Time
         String dateText = DateTimeHelper.formatDisplayDate(event.getStartTime());
         String timeText = DateTimeHelper.formatTimeRange(
                 event.getStartTime(),
@@ -106,15 +98,11 @@ public class EventDetailActivity extends AppCompatActivity {
 
         tvDateTime.setText(dateText + "\n" + timeText);
 
-        // Remind Before
         int remindBefore = event.getRemindBefore();
         String remindText = formatRemindText(remindBefore);
         tvRemind.setText("Nhắc nhở: " + remindText);
     }
 
-    /**
-     * Format remind before thành text hiển thị
-     */
     private String formatRemindText(int minutes) {
         if (minutes == 0) return "Đúng giờ";
         if (minutes < 60) return minutes + " phút trước";
@@ -133,8 +121,6 @@ public class EventDetailActivity extends AppCompatActivity {
 
         btnDelete.setOnClickListener(v -> confirmDelete());
     }
-
-    /* ========== DELETE ========== */
 
     private void confirmDelete() {
         new AlertDialog.Builder(this)

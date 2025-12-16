@@ -10,9 +10,6 @@ import android.provider.Settings;
 
 import com.example.eventmanagerapp.utils.AlarmReceiver;
 
-/**
- * AlarmScheduler - Chỉ lo scheduling và cancel alarm
- */
 public class AlarmScheduler {
 
     private final Context context;
@@ -23,22 +20,13 @@ public class AlarmScheduler {
         this.alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
     }
 
-    /**
-     * Đặt alarm cho event
-     * @param eventId ID của event
-     * @param title Tiêu đề event (hiển thị trong notification)
-     * @param triggerAtMillis Thời điểm trigger alarm
-     * @return true nếu đặt thành công, false nếu cần quyền
-     */
     public boolean scheduleAlarm(int eventId, String title, long triggerAtMillis) {
         if (alarmManager == null) {
             return false;
         }
 
-        // Kiểm tra quyền trên Android 12+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (!alarmManager.canScheduleExactAlarms()) {
-                // Cần mở settings để bật quyền
                 return false;
             }
         }
@@ -54,7 +42,6 @@ public class AlarmScheduler {
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
 
-        // Set alarm
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             alarmManager.setExactAndAllowWhileIdle(
                     AlarmManager.RTC_WAKEUP,
@@ -72,9 +59,6 @@ public class AlarmScheduler {
         return true;
     }
 
-    /**
-     * Huỷ alarm
-     */
     public void cancelAlarm(int eventId) {
         if (alarmManager == null) {
             return;
@@ -92,9 +76,6 @@ public class AlarmScheduler {
         pendingIntent.cancel();
     }
 
-    /**
-     * Check xem có quyền schedule exact alarm không (Android 12+)
-     */
     public boolean canScheduleExactAlarms() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             return alarmManager != null && alarmManager.canScheduleExactAlarms();
@@ -102,9 +83,6 @@ public class AlarmScheduler {
         return true; // Trên Android < 12 không cần quyền này
     }
 
-    /**
-     * Mở settings để bật quyền exact alarm (Android 12+)
-     */
     public void openExactAlarmSettings() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             Intent intent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
@@ -114,9 +92,6 @@ public class AlarmScheduler {
         }
     }
 
-    /**
-     * Reschedule alarm (dùng khi update event)
-     */
     public boolean rescheduleAlarm(int eventId, String title, long triggerAtMillis) {
         cancelAlarm(eventId);
         return scheduleAlarm(eventId, title, triggerAtMillis);

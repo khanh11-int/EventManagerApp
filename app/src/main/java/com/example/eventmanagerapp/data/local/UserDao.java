@@ -7,9 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.example.eventmanagerapp.domain.model.User;
 
-/**
- * Data Access Object cho User
- */
 public class UserDao {
 
     private final AppDatabase dbHelper;
@@ -25,10 +22,6 @@ public class UserDao {
         this.dbHelper = AppDatabase.getInstance(context);
     }
 
-    /**
-     * Thêm user mới
-     * @return ID của user vừa tạo, hoặc -1 nếu lỗi
-     */
     public long insert(User user) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
@@ -43,9 +36,6 @@ public class UserDao {
         return id;
     }
 
-    /**
-     * Tìm user theo username
-     */
     public User findByUsername(String username) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
@@ -67,9 +57,6 @@ public class UserDao {
         return user;
     }
 
-    /**
-     * Lấy user theo ID
-     */
     public User getById(int userId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
@@ -91,16 +78,19 @@ public class UserDao {
         return user;
     }
 
-    /**
-     * Check xem username đã tồn tại chưa
-     */
     public boolean isUsernameExists(String username) {
         return findByUsername(username) != null;
     }
 
     /**
-     * Chuyển Cursor thành User object
+     * Delete all users (for testing purposes)
      */
+    public void deleteAll() {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.delete(TABLE_USER, null, null);
+        db.close();
+    }
+
     private User cursorToUser(Cursor cursor) {
         User user = new User();
         user.setId(cursor.getInt(cursor.getColumnIndexOrThrow(COL_ID)));

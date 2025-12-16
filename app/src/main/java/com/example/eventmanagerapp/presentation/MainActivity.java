@@ -32,27 +32,22 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    // Views
     private EditText edtDate;
     private ImageButton btnPickDate, btnLogout;
     private Button btnAddEvent;
 
     private TextView[] headerDays = new TextView[7];
 
-    // ✅ đổi sang RecyclerView cho từng ô (để scroll trong ô)
     private RecyclerView[] morningCells = new RecyclerView[7];
     private RecyclerView[] afternoonCells = new RecyclerView[7];
 
-    // ✅ adapter cho từng ô
     private EventAdapter[] morningAdapters = new EventAdapter[7];
     private EventAdapter[] afternoonAdapters = new EventAdapter[7];
 
-    // Data
     private Calendar selectedDate;
     private Calendar weekStart;
     private String pendingDateToCreate;
 
-    // Use Case & Utils
     private GetEventsUseCase getEventsUseCase;
     private AlarmScheduler alarmScheduler;
     private SessionManager sessionManager;
@@ -103,7 +98,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void bindWeekCalendarViews() {
-        // Headers
         headerDays[0] = findViewById(R.id.headerDay1);
         headerDays[1] = findViewById(R.id.headerDay2);
         headerDays[2] = findViewById(R.id.headerDay3);
@@ -112,7 +106,6 @@ public class MainActivity extends AppCompatActivity {
         headerDays[5] = findViewById(R.id.headerDay6);
         headerDays[6] = findViewById(R.id.headerDay7);
 
-        // Morning cells (RecyclerView)
         morningCells[0] = findViewById(R.id.morningCell1);
         morningCells[1] = findViewById(R.id.morningCell2);
         morningCells[2] = findViewById(R.id.morningCell3);
@@ -121,7 +114,6 @@ public class MainActivity extends AppCompatActivity {
         morningCells[5] = findViewById(R.id.morningCell6);
         morningCells[6] = findViewById(R.id.morningCell7);
 
-        // Afternoon cells (RecyclerView)
         afternoonCells[0] = findViewById(R.id.afternoonCell1);
         afternoonCells[1] = findViewById(R.id.afternoonCell2);
         afternoonCells[2] = findViewById(R.id.afternoonCell3);
@@ -130,7 +122,6 @@ public class MainActivity extends AppCompatActivity {
         afternoonCells[5] = findViewById(R.id.afternoonCell6);
         afternoonCells[6] = findViewById(R.id.afternoonCell7);
 
-        // Init adapter + layout manager cho từng ô
         for (int i = 0; i < 7; i++) {
             morningAdapters[i] = new EventAdapter();
             afternoonAdapters[i] = new EventAdapter();
@@ -163,13 +154,9 @@ public class MainActivity extends AppCompatActivity {
             checkPermissionAndOpenAddEvent(dateTag);
         });
 
-        // ✅ Thêm listener cho nút đăng xuất
         btnLogout.setOnClickListener(v -> showLogoutDialog());
     }
 
-    /**
-     * ✅ Hiển thị dialog xác nhận đăng xuất
-     */
     private void showLogoutDialog() {
         new AlertDialog.Builder(this)
                 .setTitle("Đăng xuất")
@@ -179,9 +166,6 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
-    /**
-     * ✅ Thực hiện đăng xuất
-     */
     private void performLogout() {
         sessionManager.logout();
 
@@ -208,8 +192,6 @@ public class MainActivity extends AppCompatActivity {
         ).show();
     }
 
-    /* ========== RENDER WEEK ========== */
-
     private void renderWeek() {
         renderHeaderAndCellTags();
         clearAllCells();
@@ -225,7 +207,6 @@ public class MainActivity extends AppCompatActivity {
 
             headerDays[i].setText(headerText);
 
-            // ✅ giữ y như cấu trúc cũ: setTag để so eventDate
             morningCells[i].setTag(dateTag);
             afternoonCells[i].setTag(dateTag);
 
@@ -254,7 +235,6 @@ public class MainActivity extends AppCompatActivity {
             RecyclerView[] targetRow = isMorning ? morningCells : afternoonCells;
             EventAdapter[] targetAdapters = isMorning ? morningAdapters : afternoonAdapters;
 
-            // ✅ giữ đúng cấu trúc cũ: loop 7 ô và so tag
             for (int i = 0; i < 7; i++) {
                 String cellTag = (String) targetRow[i].getTag();
                 if (eventDate.equals(cellTag)) {
@@ -263,8 +243,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
-    /* ========== CHECK PERMISSION & OPEN ADD EVENT ========== */
 
     private void checkPermissionAndOpenAddEvent(String dateTag) {
         if (alarmScheduler.canScheduleExactAlarms()) {
@@ -285,8 +263,6 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("date", dateTag);
         startActivity(intent);
     }
-
-    /* ========== PERMISSION ========== */
 
     private void requestNotificationPermission() {
         if (android.os.Build.VERSION.SDK_INT >= 33) {
