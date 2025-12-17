@@ -2,17 +2,17 @@ package com.example.eventmanagerapp.domain.usecase;
 
 import android.content.Context;
 
-import com.example.eventmanagerapp.data.local.UserDao;
+import com.example.eventmanagerapp.data.repository.UserRepository;
 import com.example.eventmanagerapp.domain.model.User;
 import com.example.eventmanagerapp.utils.SessionManager;
 
 public class LoginUseCase {
 
-    private final UserDao userDao;
+    private final UserRepository repository;
     private final SessionManager sessionManager;
 
     public LoginUseCase(Context context) {
-        this.userDao = new UserDao(context);
+        this.repository = UserRepository.getInstance(context);
         this.sessionManager = new SessionManager(context);
     }
 
@@ -25,7 +25,7 @@ public class LoginUseCase {
             return Result.error("Vui lòng nhập mật khẩu");
         }
 
-        User user = userDao.findByUsername(username.trim());
+        User user = repository.getUserByUsername(username.trim());
 
         if (user == null) {
             return Result.error("Tên đăng nhập không tồn tại");

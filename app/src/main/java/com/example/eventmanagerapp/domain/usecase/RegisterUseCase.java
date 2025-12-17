@@ -2,17 +2,17 @@ package com.example.eventmanagerapp.domain.usecase;
 
 import android.content.Context;
 
-import com.example.eventmanagerapp.data.local.UserDao;
+import com.example.eventmanagerapp.data.repository.UserRepository;
 import com.example.eventmanagerapp.domain.model.User;
 import com.example.eventmanagerapp.utils.SessionManager;
 
 public class RegisterUseCase {
 
-    private final UserDao userDao;
+    private final UserRepository repository;
     private final SessionManager sessionManager;
 
     public RegisterUseCase(Context context) {
-        this.userDao = new UserDao(context);
+        this.repository = UserRepository.getInstance(context);
         this.sessionManager = new SessionManager(context);
     }
 
@@ -22,7 +22,7 @@ public class RegisterUseCase {
             return Result.error(error);
         }
 
-        if (userDao.isUsernameExists(username.trim())) {
+        if (repository.isUsernameExists(username.trim())) {
             return Result.error("Tên đăng nhập đã được sử dụng");
         }
 
@@ -32,7 +32,7 @@ public class RegisterUseCase {
         user.setFullName(fullName != null ? fullName.trim() : "");
         user.setCreatedAt(System.currentTimeMillis());
 
-        long userId = userDao.insert(user);
+        long userId = repository.createUser(user);
 
         if (userId <= 0) {
             return Result.error("Không thể tạo tài khoản");
