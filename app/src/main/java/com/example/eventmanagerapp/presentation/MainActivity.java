@@ -210,10 +210,6 @@ public class MainActivity extends AppCompatActivity {
             morningCells[i].setTag(dateTag);
             afternoonCells[i].setTag(dateTag);
 
-            final String finalDateTag = dateTag;
-            morningCells[i].setOnClickListener(v -> checkPermissionAndOpenAddEvent(finalDateTag));
-            afternoonCells[i].setOnClickListener(v -> checkPermissionAndOpenAddEvent(finalDateTag));
-
             cursor.add(Calendar.DAY_OF_MONTH, 1);
         }
     }
